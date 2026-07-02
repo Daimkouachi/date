@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surprise lisa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(135deg, #ffe4e6 0%, #ccfbf1 100%); min-height: 100vh; }
+        .runaway-btn { transition: all 0.15s ease-out; z-index: 50; position: absolute; }
+        
+        /* Style pour l'effet scrapbooking des photos souvenirs */
+        .sticker {
+            position: absolute;
+            object-fit: cover;
+            border: 6px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            transition: transform 0.3s ease;
+        }
+        .sticker:hover {
+            transform: scale(1.1) rotate(0deg) !important;
+            z-index: 40;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 font-sans text-gray-800 flex items-center justify-center min-h-screen relative overflow-x-hidden select-none">
+
+    <!-- ZONE DES STICKERS SOUVENIRS -->
+    <div class="hidden lg:block absolute inset-0 pointer-events-auto z-0">
+        <!-- Top Gauche -->
+        <img src="7.jpg" alt="Souvenir" class="sticker w-40 h-40 top-8 left-8 -rotate-12">
+        <img src="1.jpg" alt="Souvenir" class="sticker w-44 h-52 top-48 left-20 rotate-6">
+        
+        <!-- Bottom Gauche -->
+        <img src="5.jpg" alt="Souvenir" class="sticker w-44 h-56 bottom-44 left-10 -rotate-6">
+        <img src="4.jpg" alt="Souvenir" class="sticker w-40 h-40 bottom-6 left-32 rotate-12">
+
+        <!-- Top Droite -->
+        <img src="3.jpg" alt="Souvenir" class="sticker w-44 h-56 top-6 right-12 rotate-12">
+        <img src="6.jpg" alt="Souvenir" class="sticker w-52 h-40 top-52 right-24 -rotate-6">
+
+        <!-- Bottom Droite -->
+        <img src="2.jpg" alt="Souvenir" class="sticker w-44 h-56 bottom-48 right-10 rotate-6">
+        <img src="8.jpg" alt="Souvenir" class="sticker w-48 h-48 bottom-6 right-28 -rotate-12">
+    </div>
+
+    <!-- CARTE PRINCIPALE -->
+    <div id="card-container" class="max-w-md w-full bg-white rounded-3xl shadow-2xl overflow-hidden p-6 border border-white/40 backdrop-blur-md relative min-h-[480px] flex flex-col justify-center z-30">
+        
+        <!-- ÉCRAN 1 : CRÉATION DE L'INVITATION -->
+        <div id="creator-view">
+            <h1 class="text-3xl font-black text-center text-pink-600 mb-2">Date avec mon amoureuse (la plus drole) 🫶🏼</h1>
+            <p class="text-gray-500 text-center text-sm mb-6">Propose plusieurs options et laisse lisa choisir le meilleur truc (comme d'habitude mdr)</p>
+            
+            <!-- Nom de l'hôte -->
+            <div class="mb-4">
+                <label class="block font-bold text-gray-700 mb-1">👤 Ton prénom :</label>
+                <input type="text" id="host-name" placeholder="Ex: cathy ou laure" class="w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-400 focus:outline-none">
+            </div>
+
+            <!-- Dates -->
+            <div class="mb-4">
+                <label class="block font-bold text-gray-700 mb-1">📅 Proposer des dates :</label>
+                <div id="dates-container" class="space-y-2">
+                    <input type="datetime-local" class="date-input w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-400 focus:outline-none">
+                </div>
+                <button onclick="addDateInput()" class="mt-1 text-xs font-bold text-pink-500 hover:text-pink-600">+ Ajouter une autre date</button>
+            </div>
+
+            <!-- Activités -->
+            <div class="mb-6">
+                <label class="block font-bold text-gray-700 mb-1">🍕 Proposer des activités (avec lien optionnel) :</label>
+                <div id="activities-container" class="space-y-3">
+                    <div class="activity-block bg-gray-50 p-3 rounded-xl border border-gray-100 space-y-2">
+                        <input type="text" placeholder="Ex: Un resto italien 🍝" class="activity-name w-full p-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                        <input type="url" placeholder="Lien du site / Menu (optionnel) 🔗" class="activity-url w-full p-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                    </div>
+                </div>
+                <button onclick="addActivityInput()" class="mt-2 text-xs font-bold text-teal-500 hover:text-teal-600">+ Ajouter une autre activité</button>
+            </div>
+
+            <button onclick="generateLink()" class="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold p-4 rounded-xl shadow-lg hover:opacity-90 transition transform hover:-translate-y-0.5">
+                ✨ Générer mon lien d'invitation
+            </button>
+
+            <!-- Zone de partage -->
+            <div id="share-zone" class="hidden mt-6 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                <p class="text-sm font-medium text-gray-600 mb-2">Copie ce lien et envoie-le à lisa 😉 :</p>
+                <div class="flex gap-2">
+                    <input type="text" id="generated-url" readonly class="w-full p-2 text-xs bg-white border rounded-lg text-gray-500 overflow-ellipsis">
+                    <button onclick="copyLink()" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-gray-700">Copier</button>
+                </div>
+                <p id="copy-status" class="text-xs text-green-500 font-medium mt-1 hidden">Lien copié ! ✅</p>
+            </div>
+        </div>
+
+        <!-- ÉCRAN 1.5 : LA DEMANDE INITIALE (PIÈGE DU BOUTON NON) -->
+        <div id="guest-landing-view" class="hidden text-center py-6 flex flex-col justify-between h-full min-h-[380px]">
+            <div>
+                <span class="text-5xl inline-block animate-bounce mb-4">💌</span>
+                <h1 class="text-3xl font-black text-gray-800 mb-2"><span id="landing-host-name">Quelqu'un</span> ton amoureux t'invite !</h1>
+                <p class="text-gray-600 font-medium text-lg px-4 mt-4">Tu acceptes le date ? 😏</p>
+            </div>
+            
+            <div id="buttons-wrapper" class="relative w-full h-48 mt-4 flex justify-center items-center">
+                <button onclick="acceptProposal()" class="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold px-8 py-3 rounded-xl shadow-md hover:scale-105 transition transform z-10">
+                    OUI ! 😍
+                </button>
+                <button id="no-btn" onmouseover="escapeButton(event)" onmousemove="escapeButton(event)" class="runaway-btn bg-gray-200 text-gray-600 font-bold px-8 py-3 rounded-xl shadow-sm border border-gray-300 left-[58%]">
+                    Non 😢
+                </button>
+            </div>
+        </div>
+
+        <!-- ÉCRAN 2 : VUE INVITÉ -->
+        <div id="guest-view" class="hidden">
+            <h1 class="text-3xl font-black text-center text-teal-600 mb-2">Parfait ! 🥂</h1>
+            <p class="text-gray-500 text-center text-sm mb-6">Choisis ce que tu préfère et quand tu veux le faire :</p>
+
+            <form id="response-form" onsubmit="submitResponse(event)">
+                <!-- Sélection Date -->
+                <div class="mb-6">
+                    <span class="block font-bold text-gray-700 mb-3">📅 Quelles dates te vas (1 ou +) ?</span>
+                    <div id="guest-dates" class="space-y-2"></div>
+                </div>
+
+                <!-- Sélection Activité -->
+                <div class="mb-6">
+                    <span class="block font-bold text-gray-700 mb-3">✨ Qu'est-ce que tu veux faire ? 🙃</span>
+                    <div id="guest-activities" class="space-y-2"></div>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-teal-500 to-emerald-500 text-white font-bold p-4 rounded-xl shadow-lg hover:opacity-90 transition">
+                    Validation finale 🚀
+                </button>
+            </form>
+        </div>
+
+        <!-- ÉCRAN 3 : RECAPITULATIF FINAL -->
+        <div id="success-view" class="hidden text-center py-8">
+            <div class="text-5xl mb-4">🎉</div>
+            <h2 class="text-2xl font-black text-gray-800 mb-2">C'est validé !</h2>
+            <p class="text-gray-600 mb-6">Prends une capture d'écran et renvoie-lui tes choix ! 📸</p>
+            
+            <div class="bg-gray-50 p-4 rounded-2xl border text-left space-y-3">
+                <div>
+                    <span class="block text-xs font-bold text-gray-400 uppercase">Dates retenues :</span>
+                    <div id="final-dates" class="font-semibold text-gray-800"></div>
+                </div>
+                <div class="border-t pt-2">
+                    <span class="block text-xs font-bold text-gray-400 uppercase">Activités retenues :</span>
+                    <div id="final-activities" class="font-semibold text-gray-800"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Fonctions Créateur
+        function addDateInput() {
+            const container = document.getElementById('dates-container');
+            const input = document.createElement('input');
+            input.type = 'datetime-local';
+            input.className = 'date-input w-full p-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-pink-400 focus:outline-none';
+            container.appendChild(input);
+        }
+
+        function addActivityInput() {
+            const container = document.getElementById('activities-container');
+            const div = document.createElement('div');
+            div.className = 'activity-block bg-gray-50 p-3 rounded-xl border border-gray-100 space-y-2';
+            div.innerHTML = `
+                <input type="text" placeholder="Autre activité... 🎡" class="activity-name w-full p-2 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
+                <input type="url" placeholder="Lien du site / Menu (optionnel) 🔗" class="activity-url w-full p-2 text-xs rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-400">
+            `;
+            container.appendChild(div);
+        }
+
+        function generateLink() {
+            const hostName = document.getElementById('host-name').value.trim() || "Quelqu'un";
+            const dateInputs = document.querySelectorAll('.date-input');
+            const activityBlocks = document.querySelectorAll('.activity-block');
+
+            const dates = Array.from(dateInputs).map(i => i.value).filter(v => v !== "");
+            
+            const activities = [];
+            activityBlocks.forEach(block => {
+                const name = block.querySelector('.activity-name').value.trim();
+                const url = block.querySelector('.activity-url').value.trim();
+                if (name !== "") {
+                    activities.push({ n: name, u: url });
+                }
+            });
+
+            if(dates.length === 0 || activities.length === 0) {
+                alert("Remplis au moins une date et une activité ! 😉");
+                return;
+            }
+
+            const data = { h: hostName, d: dates, a: activities };
+            const encodedData = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+            
+            const shareUrl = window.location.origin + window.location.pathname + '?invite=' + encodedData;
+
+            document.getElementById('generated-url').value = shareUrl;
+            document.getElementById('share-zone').classList.remove('hidden');
+        }
+
+        function copyLink() {
+            const copyText = document.getElementById('generated-url');
+            copyText.select();
+            navigator.clipboard.writeText(copyText.value);
+            
+            const status = document.getElementById('copy-status');
+            status.classList.remove('hidden');
+            setTimeout(() => status.classList.add('hidden'), 3000);
+        }
+
+        // Routage & Décodage au chargement
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const inviteData = urlParams.get('invite');
+
+            if (inviteData) {
+                document.getElementById('creator-view').classList.add('hidden');
+                document.getElementById('guest-landing-view').classList.remove('hidden');
+
+                try {
+                    const parsedData = JSON.parse(decodeURIComponent(escape(atob(inviteData))));
+                    document.getElementById('landing-host-name').innerText = parsedData.h || "Quelqu'un";
+                    setupGuestView(parsedData);
+                } catch (e) {
+                    alert("Oups, ce lien d'invitation semble corrompu.");
+                }
+            }
+        }
+
+        function escapeButton(e) {
+            const btn = document.getElementById('no-btn');
+            const wrapper = document.getElementById('buttons-wrapper');
+            
+            const rect = wrapper.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const padding = 12;
+            const maxX = wrapper.clientWidth - btn.clientWidth - padding;
+            const maxY = wrapper.clientHeight - btn.clientHeight - padding;
+
+            let targetX = mouseX > wrapper.clientWidth / 2 ? padding : maxX;
+            let targetY = mouseY > wrapper.clientHeight / 2 ? padding : maxY;
+
+            targetX += (Math.random() - 0.5) * 20;
+            targetY += (Math.random() - 0.5) * 20;
+
+            targetX = Math.max(padding, Math.min(targetX, maxX));
+            targetY = Math.max(padding, Math.min(targetY, maxY));
+
+            btn.style.left = targetX + 'px';
+            btn.style.top = targetY + 'px';
+        }
+
+        function acceptProposal() {
+            document.getElementById('guest-landing-view').classList.add('hidden');
+            document.getElementById('guest-view').classList.remove('hidden');
+        }
+
+        // Configuration pour la vue invité
+        function setupGuestView(data) {
+            const datesContainer = document.getElementById('guest-dates');
+            const activitiesContainer = document.getElementById('guest-activities');
+
+            data.d.forEach((dateStr) => {
+                const dateObj = new Date(dateStr);
+                const options = { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit' };
+                const formattedDate = dateObj.toLocaleDateString('fr-FR', options);
+
+                datesContainer.innerHTML += `
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-teal-50/50 transition">
+                        <input type="checkbox" name="chosen-dates" value="${formattedDate}" class="w-5 h-5 accent-teal-50">
+                        <span class="text-sm font-medium">${formattedDate}</span>
+                    </label>
+                `;
+            });
+
+            data.a.forEach((act) => {
+                let urlBadge = "";
+                if (act.u && act.u.trim() !== "") {
+                    let link = act.u.startsWith('http') ? act.u : 'https://' + act.u;
+                    urlBadge = `<a href="${link}" target="_blank" class="ml-auto inline-flex items-center gap-1 text-xs font-bold text-teal-600 bg-teal-100 hover:bg-teal-200 px-2 py-1 rounded-md transition" onclick="event.stopPropagation();">Voir le site 🔗</a>`;
+                }
+
+                activitiesContainer.innerHTML += `
+                    <label class="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border cursor-pointer hover:bg-teal-50/50 transition">
+                        <input type="checkbox" name="chosen-activities" value="${act.n}" class="w-5 h-5 accent-teal-50">
+                        <span class="text-sm font-medium">${act.n}</span>
+                        ${urlBadge}
+                    </label>
+                `;
+            });
+        }
+
+        function submitResponse(e) {
+            e.preventDefault();
+
+            const checkedDates = Array.from(document.querySelectorAll('input[name="chosen-dates"]:checked')).map(el => el.value);
+            const checkedActivities = Array.from(document.querySelectorAll('input[name="chosen-activities"]:checked')).map(el => el.value);
+
+            if(checkedDates.length === 0 || checkedActivities.length === 0) {
+                alert("Choisis au moins une date et une activité ! 😊");
+                return;
+            }
+
+            document.getElementById('final-dates').innerHTML = checkedDates.map(d => `• ${d}`).join('<br>');
+            document.getElementById('final-activities').innerHTML = checkedActivities.map(a => `• ${a}`).join('<br>');
+
+            document.getElementById('guest-view').classList.add('hidden');
+            document.getElementById('success-view').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
